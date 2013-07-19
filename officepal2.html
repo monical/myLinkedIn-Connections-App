@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="generator" content="CoffeeCup HTML Editor (www.coffeecup.com)">
+    <meta name="dcterms.created" content="Tue, 25 Jun 2013 16:47:37 GMT">
+    <meta name="description" content="">
+    <meta name="keywords" content="">
+    <title></title>
+	<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
+  <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+  <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+
+  <script type="text/javascript" src="http://malsup.github.io/jquery.blockUI.js">
+</script> 
+  <link rel="stylesheet" href="/resources/demos/style.css" />
+  <style>
+  #connectionsdata { list-style-type: none; margin: 5px; padding: 5px; width:100% }
+  #connectionsdata li {list-style-type: none; margin: 3px 3px 3px 3px; padding: 5px; float: left; width: 300px; height: 100px;border: 1px solid #000; font-size: 12px; text-align:justify; }
+  </style>
+  <script>
+  $(function() {
+    $( "#connectionsdata" ).sortable();
+    $( "#connectionsdata" ).disableSelection();
+  });
+  </script>
+    <script type="text/javascript" src="http://platform.linkedin.com/in.js">
+  api_key: 3chjeg03n10q
+  onLoad: onLinkedInLoad 
+  authorize: true
+</script>
+
+    <!--[if IE]>
+    <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+<script type="text/javascript">// <![CDATA[
+// 2. Runs when the JavaScript framework is loaded
+  function onLinkedInLoad() {
+    IN.Event.on(IN, "auth", onLinkedInAuth);
+  }
+
+  // 2. Runs when the viewer has authenticated
+  function onLinkedInAuth() {
+	 IN.API.Profile("me")
+    .fields(["id", "firstName", "lastName","headline", "pictureUrl", "publicProfileUrl"])
+    .result(function(result) {
+      setLoginBadge(result.values[0]);
+    })
+    .error(function(err) {
+      alert(err);
+    });
+  }
+  
+  function setLoginBadge(profile) {
+    
+  if (!profile) {
+    profHTML = "<p>You are not logged in</p>";
+  }
+  else {
+    var pictureUrl = profile.pictureUrl || "http://static02.linkedin.com/scds/common/u/img/icon/icon_no_photo_80x80.png";
+	
+    profHTML = "<p><a href=\"" + profile.publicProfileUrl + "\">";
+    profHTML = profHTML + "<img align=\"baseline\" src=\"" + pictureUrl + "\"></a></p>"; 
+	     
+    prof2HTML =  "<p><a href=\"" + profile.publicProfileUrl + "\">";
+    prof2HTML = prof2HTML + profile.firstName + " " + profile.lastName + "</a>! <br />";
+	prof2HTML = prof2HTML + profile.headline+"</p>";
+	
+  }
+
+document.getElementById("loginbadge").innerHTML = "<p>Congratulations, Welcome </p>" ;
+ document.getElementById("loginbadge1").innerHTML =  profHTML;
+ document.getElementById("loginbadge2").innerHTML = prof2HTML;
+ 
+ 
+ 
+document.getElementById("getbutton").style.display='block';
+
+}
+
+  
+   function onProfileLoad(){
+document.getElementById("connectionstest").style.display='block';
+$.blockUI({ message: '<h1>App is fetching your connections...</h1>' });
+
+  IN.API.Connections("me")
+    .fields("id", "firstName", "lastName", "pictureUrl", "publicProfileUrl")
+    .result(function(result, metadata) {
+      setConnections(result.values, metadata);
+    });
+  }
+  
+
+   
+   function setConnections(connections) {
+ $.unblockUI();
+  var connHTML = "<ul>";
+  for (id in connections) {
+    connHTML = connHTML + "<li><a href=\"" + connections[id].publicProfileURL + "\">";
+    
+    /* picture url not always there, must be defensive */
+    if (connections[id].hasOwnProperty('pictureUrl')) {
+      connHTML = connHTML + "<img align=\"baseline\" src=\"" + connections[id].pictureUrl + "\"></a>";
+    }  else {
+      connHTML = connHTML + "<img align=\"baseline\" src=\"http://static02.linkedin.com/scds/common/u/img/icon/icon_no_photo_80x80.png\"></a>";
+    }
+    
+    connHTML = connHTML + "&nbsp;<a href=\"" + connections[id].publicProfileUrl + "\">";
+    connHTML = connHTML + connections[id].firstName + " " + connections[id].lastName + "</a>";
+	
+    connHTML = connHTML + "</li>";
+  }
+
+  connHTML = connHTML + "</ul>";
+  document.getElementById("connectionsdata").innerHTML = connHTML;
+}
+// ]]></script>
+<h2>Welcome To My First App!</h2>
+<p>This is my first app, developed using Java Script.This app will fetch your LinkedIn connections once authorized.Please login and test.</p>
+<!-- 3. Displays a button to let the viewer authenticate -->
+<script type="IN/Login"></script>
+<div id="profiles">
+<div id="loginbadge" style="float: left; margin-left: 25%;"></div>
+<div id="loginbadge1" style="float: left; margin-left: 2%;">
+<p>Login badge renders here if the current user is authorized.</p>
+</div>
+<div id="loginbadge2" style="float: left; margin-left: 5px; margin-top: 25px;"></div>
+</div>
+<p><input id="getbutton" style="display: none; clear: both; margin-left: 30%;" type="button" value="Get Connections" onclick="onProfileLoad()" /></p>
+<!--<div id="connections"></div>-->
+<div id="connectionstest" style="display: none;">
+<p>Current User's Connections:</p>
+<div id="connectionsdata" onload="showWaitPanel();"></div>
+</div>
+</body>
+</html>
